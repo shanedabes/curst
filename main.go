@@ -5,21 +5,23 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
+	"path"
 
 	notify "github.com/TheCreeper/go-notify"
 	"github.com/jessevdk/go-flags"
 )
 
 type Options struct {
-	Port    uint16 `short:"p" long:"port" description:"port to listen on" env:"CURST_PORT" default:"4950"`
-	Timeout int32  `short:"t" long:"timeout" description:"Default notification timeout" env:"CURST_TIMEOUT" default:"5000"`
+	Port     uint16 `short:"p" long:"port" description:"port to listen on" env:"CURST_PORT" default:"4950"`
+	Timeout  int32  `short:"t" long:"timeout" description:"Default notification timeout" env:"CURST_TIMEOUT" default:"5000"`
+	IconPath string `short:"i" long:"icon_path" description:"Notification icons path" env:"CURST_ICON_PATH" default:"~/.local/share/curst/icons"`
 }
 
 type NotifyRequest struct {
 	AppIcon string `json:"appicon,omitempty"`
 	Summary string `json:"summary,omitempty"`
 	Body    string `json:"body,omitempty"`
+	Icon    string `json:"icon,omitempty"`
 	Timeout int32  `json:"timeout,omitempty"`
 }
 
@@ -35,7 +37,7 @@ func main() {
 
 	_, err := flags.Parse(&opts)
 	if err != nil {
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
 	http.HandleFunc("/notify", func(w http.ResponseWriter, r *http.Request) {
@@ -49,9 +51,9 @@ func main() {
 
 		n := notify.Notification{
 			AppName: "curst",
-			AppIcon: "/tmp/img.jpg",
 			Summary: nr.Summary,
 			Body:    nr.Body,
+			AppIcon: path.Join(opts.IconPath, nr.Icon),
 			Timeout: defInt(nr.Timeout, opts.Timeout),
 		}
 
