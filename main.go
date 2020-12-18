@@ -13,7 +13,7 @@ import (
 
 type Options struct {
 	Port     uint16 `short:"p" long:"port" description:"port to listen on" env:"CURST_PORT" default:"4950"`
-	Timeout  int32  `short:"t" long:"timeout" description:"Default notification timeout" env:"CURST_TIMEOUT" default:"5000"`
+	Timeout  int32  `short:"t" long:"timeout" description:"Default notification timeout" env:"CURST_TIMEOUT" default:"10000"`
 	IconPath string `short:"i" long:"icon_path" description:"Notification icons path" env:"CURST_ICON_PATH" default:"~/.local/share/curst/icons"`
 }
 
@@ -29,6 +29,7 @@ func defInt(x, y int32) int32 {
 	if x > 0 {
 		return x
 	}
+
 	return y
 }
 
