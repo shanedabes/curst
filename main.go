@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"path"
+	"strings"
 
 	notify "github.com/TheCreeper/go-notify"
 	"github.com/jessevdk/go-flags"
@@ -23,6 +24,7 @@ type NotifyRequest struct {
 	Body    string `json:"body,omitempty"`
 	Icon    string `json:"icon,omitempty"`
 	Timeout int32  `json:"timeout,omitempty"`
+	Urgency string `json:"urgency,omitempty"`
 }
 
 func defInt(x, y int32) int32 {
@@ -31,6 +33,17 @@ func defInt(x, y int32) int32 {
 	}
 
 	return y
+}
+
+func urgencyByte(u string) byte {
+	switch strings.ToLower(u) {
+	case "low":
+		return notify.UrgencyLow
+	case "critical":
+		return notify.UrgencyCritical
+	default:
+		return notify.UrgencyNormal
+	}
 }
 
 func main() {
@@ -56,6 +69,9 @@ func main() {
 			Body:    nr.Body,
 			AppIcon: path.Join(opts.IconPath, nr.Icon),
 			Timeout: defInt(nr.Timeout, opts.Timeout),
+			Hints: map[string]interface{}{
+				"urgency": urgencyByte(nr.Urgency),
+			},
 		}
 
 		if _, err := n.Show(); err != nil {
